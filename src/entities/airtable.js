@@ -2,6 +2,12 @@ const Airtable = require('airtable');
 const { Mixin } = require('mixwith');
 const check = require('check-types');
 
+const toArray = element => {
+  if (check.array(element)) return element
+  if (check.assigned(element)) return [element]
+  return []
+}
+
 const AirtableRecordMixin = airtableApiKey => {
   return Mixin((superclass) => {
     class Class extends superclass {
@@ -11,6 +17,21 @@ const AirtableRecordMixin = airtableApiKey => {
         entity.$airtableBaseClient = this.$airtableBaseClient;
         entity.$airtableTableClient = this.$airtableTableClient;
         return entity;
+      }
+
+      async getAirtableRecordId (baseId, tableName) {
+        await this.resolve();
+        const _airtableRecords = toArray(this.airtableRecordObjectProperty);
+        return (await Promise.all(_airtableRecords.
+          map(async _airtableRecord => {
+            await _airtableRecord.resolve();
+            return _airtableRecord;
+          }))).
+          filter(_airtableRecord => {
+            return _airtableRecord.properties.airtableBaseDataProperty === baseId &&
+              _airtableRecord.properties.airtableTableDataProperty === tableName
+          }).
+          map(_airtableRecord => _airtableRecord.properties.airtableRecordDataProperty);
       }
 
       /* eslint-disable-next-line class-methods-use-this */
@@ -44,11 +65,11 @@ const AirtableRecordMixin = airtableApiKey => {
       }
 
       async $$updateRecordEntity (airtableClients, recordId, body) {
-        return airtableClients.table.update(recordId, body);
+        return airtableClients.table.update(recordId, body, {typecast: true});
       }
 
       async $$createRecordEntity (airtableClients, body) {
-        const record = await airtableClients.table.create(body);
+        const record = await airtableClients.table.create(body, {typecast: true});
         const recordIndividual = await this.client.Individual.create({
           airtableRecordClass: true,
           airtableBaseDataProperty: record._table._base._id,
