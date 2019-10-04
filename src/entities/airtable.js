@@ -11,12 +11,20 @@ const toArray = element => {
 const AirtableRecordMixin = airtableApiKey => {
   return Mixin((superclass) => {
     class Class extends superclass {
+      constructor (client, payload, options) {
+        super(client, payload);
+        Object.assign(this, options);
+      }
+
       static from (payload) {
-        const entity = super.from(payload);
-        entity.$airtableClient = this.$airtableClient;
-        entity.$airtableBaseClient = this.$airtableBaseClient;
-        entity.$airtableTableClient = this.$airtableTableClient;
-        return entity;
+        if (!(payload instanceof this.client.Payload)) {
+          throw new Error('unable to create a new AirtableRecord via from; expected param@payload to be a Payload instance but found ' + payload.constructor.name);
+        }
+        return new this(this.client, payload, {
+          '$airtableClient': this.$airtableClient,
+          '$airtableBaseClient': this.$airtableBaseClient,
+          '$airtableTableClien': this.$airtableTableClient
+        });
       }
 
       async getAirtableRecordId (baseId, tableName) {
