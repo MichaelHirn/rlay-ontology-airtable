@@ -14,7 +14,8 @@
     "@rlay/rlay-client-lib": "^0.2.0-pre.10",
     "@rlay/transform": "^0.3.0",
     "@rlay/web3-rlay": "^0.1.14",
-    "airtable": "^0.7.1"
+    "airtable": "^0.7.1",
+    "scrypt": "^6.0.3"
   },
   "devDependencies": {
     "@rlay/utils": "0.0.5",
