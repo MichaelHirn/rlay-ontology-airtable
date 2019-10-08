@@ -1,12 +1,13 @@
 /* eslint-env node, mocha */
 const rlayClient = require('../src');
-const simple = require('simple-mock');
+const sinon = require('sinon');
 const assert = require('assert');
 
 describe('RlayOntologyJigsaw', () => {
   describe('Record', () => {
     context('new individual', () => {
       let airEntity, AirtableRecordMock;
+      let rlayCreateEntityStub, airtableCreateStub, airtableUpdateStub;
       before(() => {
         AirtableRecordMock = class extends rlayClient.AirtableRecordMixin('mockKey')(
           rlayClient.Individual) { }
@@ -17,26 +18,32 @@ describe('RlayOntologyJigsaw', () => {
         AirtableRecordMock.$airtableBaseClient = AirtableRecordMock.$airtableClient.Base.createFunctor();
         AirtableRecordMock.$airtableTableClient = AirtableRecordMock.$airtableBaseClient('mock');
       });
-      before(() => simple.mock(AirtableRecordMock.$airtableTableClient, 'create').resolveWith({
-        _table: {
-          _base: { _id: undefined },
-          id: null,
-          name: 'mock'
-        },
-        id: 'recMock'
-      }));
-      before(() => simple.mock(AirtableRecordMock.$airtableTableClient, 'update').resolveWith(''));
-      before(async () => {
-        const indi = await rlayClient.Individual.create({
-          airtableRecordClass: true
+      before(() => {
+        airtableCreateStub = sinon.stub(AirtableRecordMock.$airtableTableClient, 'create').resolves({
+          _table: {
+            _base: { _id: undefined },
+            id: null,
+            name: 'mock'
+          },
+          id: 'recMock'
         });
+      });
+      before(() => {
+        airtableUpdateStub = sinon.stub(AirtableRecordMock.$airtableTableClient, 'update').
+          resolves('')
+      });
+      before(async () => {
+        const indi = await rlayClient.Individual.create({ airtableRecordClass: true });
         airEntity = AirtableRecordMock.from(indi.payload);
         await airEntity.resolve();
         await airEntity.create({ Name: airEntity.cid });
       });
-      beforeEach(() => simple.mock(rlayClient, 'createEntity').resolveWith('0x0000'));
-      beforeEach(() => simple.mock(AirtableRecordMock.$airtableTableClient, 'create').reset());
-      beforeEach(() => simple.mock(AirtableRecordMock.$airtableTableClient, 'update').reset());
+      before(() => {
+        rlayCreateEntityStub = sinon.stub(rlayClient, 'createEntity').resolves('0x0000')
+      });
+      beforeEach(() => rlayCreateEntityStub.resetHistory());
+      beforeEach(() => airtableCreateStub.resetHistory());
+      beforeEach(() => airtableUpdateStub.resetHistory());
 
       it('calls airtable.create never', async () => {
         await airEntity.create({ Name: airEntity.cid });

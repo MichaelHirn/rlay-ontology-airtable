@@ -23,7 +23,7 @@ const AirtableRecordMixin = airtableApiKey => {
         return new this(this.client, payload, {
           '$airtableClient': this.$airtableClient,
           '$airtableBaseClient': this.$airtableBaseClient,
-          '$airtableTableClien': this.$airtableTableClient
+          '$airtableTableClient': this.$airtableTableClient
         });
       }
 

@@ -6,20 +6,20 @@
   "scripts": {
     "seed": "rlay-seed --backend myneo4j --input src/ontology.js > src/generated/cids.json",
     "generate": "rlay-generate --seed-file-output src/generated/cids.json --seed-file src/ontology.js --output src/index.js",
-    "test": "mocha"
+    "test": "mocha --no-timeouts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rlay/rlay-client-lib": "^0.2.0-pre.10",
+    "@rlay/rlay-client-lib": "^0.2.0",
     "@rlay/transform": "^0.3.0",
     "@rlay/web3-rlay": "^0.1.14",
-    "airtable": "^0.7.1",
-    "scrypt": "^6.0.3"
+    "airtable": "^0.7.1"
   },
   "devDependencies": {
     "@rlay/utils": "0.0.5",
     "mocha": "^6.2.0",
-    "simple-mock": "^0.8.0"
+    "simple-mock": "^0.8.0",
+    "sinon": "^7.5.0"
   }
 }
