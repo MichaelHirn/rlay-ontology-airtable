@@ -85,10 +85,10 @@ const AirtableRecordMixin = airtableApiKey => {
           airtableRecordDataProperty: record.id,
         });
         this.remoteCid = this.cid;
-        await Promise.all([
-          this.assert({airtableRecordObjectProperty: recordIndividual}),
-          recordIndividual.assert({airtableRecordeeObjectProperty: this})
-        ]);
+
+        await this.assert({airtableRecordObjectProperty: recordIndividual});
+        await recordIndividual.assert({airtableRecordeeObjectProperty: this});
+
         return record;
       }
 
