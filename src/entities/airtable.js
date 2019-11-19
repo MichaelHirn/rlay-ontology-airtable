@@ -62,7 +62,7 @@ const AirtableRecordMixin = airtableApiKey => {
           } else if (hits.length === 1) {
             return this.$$updateRecordEntity(
               airtableClients,
-              this.airtableRecordObjectProperty.properties.airtableRecordDataProperty,
+              hits[0].properties.airtableRecordDataProperty,
               body
             );
           }
